@@ -27,6 +27,12 @@ interface Message {
   content: string;
 }
 
+interface RecentMessage {
+  sender: string;
+  text: string;
+  id: number;
+}
+
 // Validate topic input
 function validateTopic(topic: string): boolean {
   // More comprehensive topic validation
@@ -74,7 +80,7 @@ export async function POST(request: NextRequest) {
     ];
 
     // Limit conversation history
-    const recentMessages = safeMessages.slice(-5);
+    const recentMessages: RecentMessage[] = safeMessages.slice(-5);
 
     // Dynamic model selection based on conversation history
     let currentModel: string;
@@ -112,7 +118,7 @@ export async function POST(request: NextRequest) {
         role: 'system', 
         content: `The current discussion topic is: ${topic}. Engage with this subject matter using your unique intellectual approach, but keep your response conversational and concise.` 
       },
-      ...recentMessages.slice(-4).map((msg: any) => ({
+      ...recentMessages.slice(-4).map((msg: RecentMessage) => ({
         role: (msg.sender.toLowerCase() === 'claude' ? 'assistant' : 'user') as 'user' | 'assistant',
         content: msg.text
       }))
@@ -160,7 +166,7 @@ export async function POST(request: NextRequest) {
         details: {
           status: error.status,
           message: error.message,
-          code: (error as any).code // Use type assertion
+          code: error.code // Remove type assertion
         }
       }, { status: error.status || 500 });
     }
