@@ -165,8 +165,7 @@ export async function POST(request: NextRequest) {
         error: 'Groq API Error',
         details: {
           status: error.status,
-          message: error.message,
-          code: error.code // Remove type assertion
+          message: error.message
         }
       }, { status: error.status || 500 });
     }
